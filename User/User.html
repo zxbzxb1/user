@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./vue.js"></script>
+    <style>
+        .box {
+            display: flex;
+        }
+
+        .userdel {
+            display: flex;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <app></app>
+    </div>
+</body>
+<script>
+    var App = {
+        data() {
+            return {
+                userlist: [
+                    {
+                        username: "小红",
+                        id: "a01"
+                    },
+                    {
+                        username: "小黄",
+                        id: "a02"
+                    },
+                    {
+                        username: "小蓝",
+                        id: "a03"
+                    },
+                    {
+                        username: "小绿",
+                        id: "a04"
+                    },
+                    {
+                        username: "小白",
+                        id: "a05"
+                    }
+                ],
+                searchusername: null,
+                istrue: false,
+                temp: null,
+                transitionglass: null,
+                transitionglass_one: null,
+                returnistrue: false,
+                returnistrue_one: false,
+                searchname: true,
+                searchid: true,
+                addbut: true,
+
+            }
+        },
+        template:
+            `
+                    <div class="box">
+                        <div ref="searchuserlist">
+                            <div>用户列表</div>
+                            <div v-for="item in userlist" :key="item.id" class="userdel">
+                                <div>{{item.username}}</div>
+                                <button @click="deluser(item.id)">删除</button>
+                                <button @click="compile(item.id)">编辑</button>
+                            </div>
+                        </div>
+                        <div>
+                            <input v-model="searchusername"></input>
+                            <button @click="over" v-show="istrue">完成</button>
+                            <button @click="searchusernamebut" v-show="searchname">搜素用户名</button>
+                            <button @click="searchidbut" v-show="searchid">搜素ID</button>
+                            <button @click="returnbut" v-show="returnistrue">返回</button>
+                            <button @click="returnbut_one" v-show="returnistrue_one">返回</button>
+                            <button @click="adduser" v-show="addbut">增加</button>
+                        </div>
+                    </div>
+                        
+                    `,
+        methods: {
+            adduser() {
+                if (!this.searchusername) return
+                this.userlist.push({
+                    id: Date.parse(new Date()),
+                    username: this.searchusername
+                });
+                this.searchusername = null
+                console.log(this.userlist);
+            },
+            deluser(id) {
+                this.userlist = this.userlist.filter((item) => item.id != id)
+            },
+            compile(id) {
+                this.istrue = !this.istrue
+                this.temp = this.userlist.find((item) => item.id == id)
+                this.searchusername = this.temp.username
+                this.searchname = false
+                this.searchid = false
+                this.addbut = false
+            },
+            over() {
+                this.istrue = !this.istrue
+                this.temp.username = this.searchusername
+                this.searchusername = null
+                this.searchname = true
+                this.searchid = true
+                this.addbut = true
+            },
+            searchusernamebut() {
+                if (!this.searchusername) return
+                this.glasstransition = this.userlist
+                this.userlist = this.userlist.filter((item) => item.username == this.searchusername)
+                this.$nextTick(function () {
+                    if (this.$refs.searchuserlist.children.length < 2) {
+                        this.userlist = this.glasstransition
+                    }
+                    else {
+                        this.returnistrue = true
+                        this.searchname = false
+                        this.searchid = false
+                        this.addbut = false
+                    }
+                })
+            },
+            searchidbut() {
+                if (!this.searchusername) return
+                this.transitionglass_one = this.userlist
+                this.userlist = this.userlist.filter((item) => item.id == this.searchusername)
+                this.$nextTick(function () {
+                    if (this.$refs.searchuserlist.children.length < 2) {
+                        this.userlist = this.transitionglass_one
+                    }
+                    else {
+                        this.returnistrue_one = true
+                        this.searchname = false
+                        this.searchid = false
+                        this.addbut = false
+                    }
+                })
+
+            },
+            returnbut() {
+                this.userlist = this.glasstransition
+                this.searchname = true
+                        this.searchid = true
+                        this.addbut = true
+                        this.returnistrue = false
+            },
+            returnbut_one(){
+                this.userlist = this.transitionglass_one
+                this.searchname = true
+                        this.searchid = true
+                        this.addbut = true
+                        this.returnistrue_one = false
+                
+            }
+        }
+    };
+
+    var app = new Vue({
+        el: "#app",
+        components: {
+            App,
+        },
+    });
+</script>
+
+</html>
